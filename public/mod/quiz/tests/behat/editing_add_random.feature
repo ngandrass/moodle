@@ -194,6 +194,35 @@ Feature: Adding random questions to a quiz based on category and tags
     When I open the "last" add to quiz menu
     Then I should not see "a random question"
 
+  Scenario: A random question can be added from a shared bank in a course where the teacher cannot edit quizzes
+    Given the following "courses" exist:
+      | fullname | shortname |
+      | Course 2 | C2        |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | teacher1 | C2     | teacher |
+    And the following "activities" exist:
+      | activity | name    | intro                     | course | idnumber |
+      | qbank    | Qbank 2 | Question bank in Course 2 | C2     | qbank2   |
+    And the following "question categories" exist:
+      | contextlevel    | reference | name              |
+      | Activity module | qbank2    | Qbank 2 questions |
+    And the following "questions" exist:
+      | questioncategory  | qtype | name               | user  | questiontext     |
+      | Qbank 2 questions | essay | Qbank 2 question 1 | admin | Qbank 2 question |
+    And I am on the "Quiz 1" "mod_quiz > Edit" page logged in as "teacher1"
+    When I open the "last" add to quiz menu
+    And I follow "a random question"
+    And I click on "Switch bank" "button"
+    And I open the autocomplete suggestions list
+    And I click on "C2 - Qbank 2" item in the autocomplete list
+    Then I should see "Current bank: Qbank 2"
+    And I apply question bank filter "Category" with value "Qbank 2 questions"
+    And I should see "Qbank 2 question 1"
+    And I select "1" from the "randomcount" singleselect
+    And I press "Add random question"
+    And I should see "Random (Qbank 2 questions) based on filter condition" on quiz page "1"
+
   Scenario: A random question can be added to the quiz by creating a new category
     Given I am on the "Quiz 1" "mod_quiz > Edit" page logged in as "teacher1"
     When I open the "last" add to quiz menu
