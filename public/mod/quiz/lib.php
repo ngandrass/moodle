@@ -2527,7 +2527,11 @@ function mod_quiz_output_fragment_add_random_question_form($args) {
     $extraparams['view'] = mod_quiz\question\bank\random_question_view::class;
 
     $course = get_course($cm->course);
-    require_capability('mod/quiz:manage', $contexts->lowest());
+    // The quiz must be editable, and the questions in the bank (which may be in another course) must be usable.
+    require_capability('mod/quiz:manage', \core\context\module::instance($extraparams['quizcmid']));
+    if (!has_capability('moodle/question:useall', $contexts->lowest())) {
+        require_capability('moodle/question:usemine', $contexts->lowest());
+    }
 
     // Custom View.
     $questionbank = new mod_quiz\question\bank\random_question_view($contexts, $thispageurl, $course, $cm, $pagevars, $extraparams);
